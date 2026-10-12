@@ -1,0 +1,64 @@
+# Publish every example as an interactive story on GitHub Pages.
+#
+# On each push to main: verify every project from scratch (so the site never shows a stale
+# report), turn the results into the story site with tools/site/build_site.py, and deploy it.
+# A design that cannot be verified (say, the code no longer builds) fails the run, and the
+# previous site stays up.
+#
+# One-time setup: Settings → Pages → Build and deployment → Source: GitHub Actions.
+
+name: Publish the stories
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # CMake and g++ build the examples. libclang reads their headers; the pip wheel has no
+      # headers of its own (stddef.h, ...), so it borrows those of an installed clang.
+      - name: Install the toolchain
+        run: |
+          command -v clang || (sudo apt-get update && sudo apt-get install -y --no-install-recommends clang)
+          python -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+
+      - name: Verify every project
+        run: .venv/bin/python tools/verify.py --all
+
+      - name: Build the stories
+        run: .venv/bin/python tools/site/build_site.py --out _site --start 3-state-simple
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
