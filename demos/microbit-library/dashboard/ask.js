@@ -6,7 +6,7 @@ import { betaTool } from "https://esm.sh/@anthropic-ai/sdk@0.128.0/helpers/beta/
 
 import { eventRow, findEvents, findLoans, groupLoans, loanRow } from "./db.js";
 
-const MODEL = "claude-opus-5-5";
+const MODEL = "claude-haiku-5-5";
 
 const SYSTEM = `You answer questions about a small library that runs on a BBC micro:bit.
 Five books, A to E, can be lent to members and returned. The browser keeps the history in
