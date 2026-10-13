@@ -47,6 +47,24 @@ jobs:
       - name: Build the stories
         run: .venv/bin/python tools/site/build_site.py --out _site --start 3-state-simple
 
+      # The micro:bit demo (demos/microbit-library) is published at /microbit/: its dashboard,
+      # and the firmware the dashboard offers for download. The firmware build fetches CODAL
+      # from GitHub; if that fails, the stories still go out, without the .hex.
+      - uses: actions/cache@v4
+        with:
+          path: demos/microbit-library/firmware/.build
+          key: microbit-${{ hashFiles('demos/microbit-library/firmware/build.sh', 'demos/microbit-library/firmware/codal.json') }}
+
+      - name: Build the micro:bit firmware
+        continue-on-error: true
+        run: demos/microbit-library/firmware/build.sh
+
+      - name: Add the micro:bit dashboard
+        run: |
+          mkdir -p _site/microbit
+          cp demos/microbit-library/dashboard/* _site/microbit/
+          if [ -f demos/microbit-library/firmware/MICROBIT.hex ]; then cp demos/microbit-library/firmware/MICROBIT.hex _site/microbit/; fi
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3

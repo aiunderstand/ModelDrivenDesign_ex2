@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>micro:bit Library</title>
+    <meta name="description" content="Dashboard for the example-6 lending library running on a BBC micro:bit v2: WebSerial, IndexedDB history and questions answered by Claude.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 5 5'%3E%3Crect width='5' height='5' rx='.8' fill='%23111'/%3E%3Cpath fill='%23ff3b30' d='M1.1 1.1h.8v.8h-.8zM3.1 1.1h.8v.8h-.8zM1.1 3.1h2.8v.8H1.1z'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="app.js"></script>
+</head>
+<body>
+    <header class="top">
+        <div class="brand">
+            <span class="logo" aria-hidden="true"></span>
+            <div>
+                <h1>micro:bit Library</h1>
+                <p class="sub">Example 6's lending classes, running on the board</p>
+            </div>
+        </div>
+        <div class="actions">
+            <span id="status" class="pill" data-state="off">Not connected</span>
+            <button id="connect" class="primary" type="button">Connect micro:bit</button>
+            <a class="button" href="MICROBIT.hex" download>Firmware .hex</a>
+        </div>
+    </header>
+    <p id="unsupported" class="notice" hidden>
+        This browser has no WebSerial. Open the page in Chrome or Edge on a computer to connect a
+        micro:bit; the history and the questions work everywhere.
+    </p>
+
+    <main class="grid">
+        <section class="card shelf" aria-labelledby="shelf-title">
+            <h2 id="shelf-title">Shelf</h2>
+            <div class="current">
+                <div id="matrix" class="matrix" role="img" aria-label="The board's display"></div>
+                <div class="current-text">
+                    <p class="label">On the board</p>
+                    <p id="current-title" class="current-title">—</p>
+                    <p id="current-status" class="current-status"></p>
+                    <div class="buttons">
+                        <button id="lend" type="button" disabled><kbd>A</kbd> Lend</button>
+                        <button id="return" type="button" disabled><kbd>B</kbd> Return</button>
+                    </div>
+                </div>
+            </div>
+            <ul id="books" class="books"></ul>
+            <p class="hint">Tilt the board left or right to choose a book. Press A to lend it, B to return it.</p>
+        </section>
+
+        <section class="card ask" aria-labelledby="ask-title">
+            <h2 id="ask-title">Ask the history</h2>
+            <form id="ask-form" class="ask-form">
+                <label class="visually-hidden" for="question">Question</label>
+                <textarea id="question" rows="2" placeholder="How often has this book been loaned?" required></textarea>
+                <button id="ask-button" class="primary" type="submit">Ask Claude</button>
+            </form>
+            <div id="suggestions" class="suggestions"></div>
+            <div id="answer" class="answer" hidden>
+                <div id="answer-text" class="answer-text"></div>
+                <details id="queries" class="queries">
+                    <summary>Queries Claude ran</summary>
+                    <ol id="query-list"></ol>
+                </details>
+            </div>
+            <details id="key-box" class="key-box">
+                <summary>Anthropic API key <span id="key-state" class="muted"></span></summary>
+                <div class="key-fields">
+                    <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…">
+                    <label class="check"><input id="remember-key" type="checkbox"> Remember on this device</label>
+                </div>
+                <p class="muted small">
+                    Your browser sends the key and your question straight to api.anthropic.com; nothing
+                    passes through this site. Claude reads the history only through three read-only
+                    queries that run here, in your browser. A remembered key stays in this browser's
+                    storage, so only tick the box on your own computer.
+                </p>
+            </details>
+        </section>
+
+        <section class="card activity" aria-labelledby="activity-title">
+            <h2 id="activity-title">Activity</h2>
+            <ol id="log" class="log"></ol>
+        </section>
+
+        <section class="card manager" aria-labelledby="manager-title">
+            <div class="manager-head">
+                <h2 id="manager-title">Database</h2>
+                <div class="toolbar">
+                    <button id="export" type="button">Export</button>
+                    <label class="button">Import<input id="import" type="file" accept="application/json,.json" hidden></label>
+                    <button id="sample" type="button">Add sample data</button>
+                    <button id="clear" type="button" class="danger">Clear</button>
+                </div>
+            </div>
+            <div id="tabs" class="tabs" role="tablist"></div>
+            <div class="table-wrap">
+                <table id="table"></table>
+            </div>
+            <p class="muted small">IndexedDB <code>microbit-library</code> through Dexie.js; newest 200 rows shown.</p>
+        </section>
+    </main>
+
+    <footer class="foot">
+        The classes come from
+        <a href="https://github.com/aiunderstand/ModelDrivenDesign_ex2/tree/main/examples/6-sequence-library">example 6</a>
+        with its deliberate mistakes fixed; the firmware and this page are in
+        <a href="https://github.com/aiunderstand/ModelDrivenDesign_ex2/tree/main/demos/microbit-library">demos/microbit-library</a>.
+    </footer>
+</body>
+</html>
